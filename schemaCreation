@@ -1,0 +1,110 @@
+-- create tables
+
+ CREATE TABLE "APPLICATION"."USERS" 
+   (	"EMAIL" VARCHAR2(100 BYTE), 
+	"PASSWORD" VARCHAR2(30 BYTE), 
+	"FIRST_NAME" VARCHAR2(30 BYTE), 
+	"LAST_NAME" VARCHAR2(30 BYTE), 
+	"AGE" NUMBER(3,0), 
+	"SEX" VARCHAR2(1 BYTE), 
+	 CONSTRAINT "PK_EMAIL" PRIMARY KEY ("EMAIL")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "USERS"  ENABLE
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "USERS" ;
+    
+  CREATE TABLE "APPLICATION"."PLACES" 
+   (	"PLACE_ID" NUMBER(4,0) NOT NULL ENABLE, 
+	"PLACE_NAME" VARCHAR2(100 BYTE), 
+	"ADDRESS" VARCHAR2(1000 BYTE), 
+	"AVG_MARK" NUMBER(4,2), 
+	 CONSTRAINT "PLACES_PK" PRIMARY KEY ("PLACE_ID")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "USERS"  ENABLE
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "USERS" ;
+
+CREATE TABLE "APPLICATION"."LABELS" 
+   (	"LABEL_ID" NUMBER(3,0) NOT NULL ENABLE, 
+	"LABEL" VARCHAR2(100 BYTE), 
+	 CONSTRAINT "LABELS_PK" PRIMARY KEY ("LABEL_ID")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  TABLESPACE "USERS"  ENABLE
+   ) SEGMENT CREATION DEFERRED 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING
+  TABLESPACE "USERS" ;
+  
+CREATE TABLE VISITED_PLACES
+( visit_place_id	number,
+email	varchar2(100),
+place_id	number(4),
+mark	number(2),
+visit_date	date,
+  CONSTRAINT visited_places_pk PRIMARY KEY (visit_place_id),
+  CONSTRAINT fk_users
+    FOREIGN KEY (email)
+    REFERENCES users(email),
+   CONSTRAINT fk_places
+    FOREIGN KEY (place_id)
+    REFERENCES places(place_id)
+);
+
+CREATE TABLE PLACE_LABLE (
+place_id	number(4),
+label_id	number(3),
+CONSTRAINT PK_PLACE_LABEL PRIMARY KEY (place_id, label_id),
+CONSTRAINT fk_place_id
+FOREIGN KEY (place_id)
+REFERENCES places (place_id),
+CONSTRAINT fk_label_id
+FOREIGN KEY (label_id)
+REFERENCES labels (label_id)
+);
+
+CREATE TABLE HISTORIC_ANSWERS(
+email	varchar2(100),
+Q1	char(1),
+Q2	char(1),
+Q3	char(1),
+Q4	char(1),
+Q5	char(1),
+Q6	char(1),
+Q7	char(1),
+Q8	char(1),
+Q9	char(1),
+Q10	char(1),
+Q11	char(1),
+Q12 char(1),
+question_date	date,
+constraint fk_email
+foreign key (email)
+references users(email));
+
+--insert data into tables
+
+insert into places (place_id, place_name, address) values(100, 'CasaLucio','CavaBaja');
+insert into USERS (email, password, first_name, last_name, age, sex) values ('danalachelarisa@yahoo.com','pa$$w0rd','Larisa','Danalache',26,'F');
+commit;
+insert into visited_places(visit_place_id, email, place_id, mark, visit_date) values(201,'danalachelarisa@yahoo.com', 100, 8, '11-JAN-2016');
+commit;
+--rows inserted successfully;
+insert into visited_places(visit_place_id, email, place_id, mark, visit_date) values(202,'blabla@yahoo.com', 100, 8, '11-JAN-2016');
+--error:ORA-02291: integrity constraint (APPLICATION.FK_USERS) violated - parent key not found
+-- the email has to exist in USERS table before inserting it into VISITED_PLACES_TABLE. This is Foreign Key magic :)
